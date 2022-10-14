@@ -3,8 +3,13 @@ import jax.numpy as np
 import numpy as onp
 from tqdm.auto import tqdm
 
+import sys
+
+sys.path.append("./pymicromegas/micromegas/MSSM")
+
 from utils.distributed import apply_distributed
-from pymicromegas import EwsbParameters, spheno, MicromegasSettings
+from pymicromegas import EwsbParameters, MicromegasSettings
+import spheno
 from atlas_constraints import calc_atlas_pvals
 
 """

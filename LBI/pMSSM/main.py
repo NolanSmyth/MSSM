@@ -1,11 +1,10 @@
-import torch
 import jax
 import jax.numpy as np
 import numpy as onp
-from trax.jaxboard import SummaryWriter
 from lbi.pipeline.base import pipeline
 from lbi.prior import SmoothedBoxPrior
 import h5py
+
 # from lbi.diagnostics import MMD, ROC_AUC, LR_ROC_AUC
 from lbi.sampler import hmc
 from simulator import get_simulator, theta_addunits, theta_ranges
@@ -22,35 +21,38 @@ from pipeline_kwargs import pipeline_kwargs
 
 
 from jax.config import config
-config.update('jax_disable_jit', True)
+
+config.update("jax_disable_jit", True)
 
 
 def scale_X(x):
     """
     x: jax.numpy array
     """
-    omega = np.atleast_2d(np.log10(np.clip(x[..., 0], a_min=1e-5, a_max=None))*2).T
-    
+    omega = np.atleast_2d(np.log10(np.clip(x[..., 0], a_min=1e-5, a_max=None)) * 2).T
+
     gmuon = np.clip(x[..., 1], a_min=1e-11, a_max=1e-8)
     gmuon = np.atleast_2d(np.log10(gmuon) + 9.5).T
-    
+
     mh = np.clip(x[..., 2], a_min=120)
     mh = np.atleast_2d((mh - 123.86377) / 2.2839).T
-    
+
     out = [omega, gmuon, mh]
-    
+
     if pipeline_kwargs["simulator_kwargs"]["use_direct_detection"]:
         # if exists, it'll always be 3rd
         xenon_pval = np.atleast_2d(np.clip(x[..., 3], a_min=None, a_max=X_true[:, 3])).T
         out += [xenon_pval]
-        
+
     if pipeline_kwargs["simulator_kwargs"]["use_atlas_constraints"]:
         # this will always be last
-        atlas_pval = np.atleast_2d(np.clip(x[..., -1], a_min=None, a_max=X_true[:, -1])).T
+        atlas_pval = np.atleast_2d(
+            np.clip(x[..., -1], a_min=None, a_max=X_true[:, -1])
+        ).T
         out += [atlas_pval]
-        
+
     out = np.hstack(out)
-    
+
     return out
 
 
@@ -252,7 +254,7 @@ results = big_simulator(rng, samples[:num_samples])
 samples_and_results = results
 samples_and_results["samples"] = unitful_samples[:num_samples]
 
-hf = h5py.File('samples_and_results.h5', 'w')
+hf = h5py.File("samples_and_results.h5", "w")
 for key, arr in samples_and_results.items():
     hf.create_dataset(key, data=arr)
 hf.close()

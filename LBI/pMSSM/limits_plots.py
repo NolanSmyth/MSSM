@@ -7,7 +7,7 @@ import os
 from cycler import cycler
 from digitized_constraints import (
     atlas_mean_limits,
-    atlas_upper_1sigma, 
+    atlas_upper_1sigma,
     atlas_lower_1sigma,
     xenont_1T_SI_MAP,
     xenon_1T_SI_MAP_upper_1sig,
@@ -62,7 +62,7 @@ def plot_direct_detection_limits(
     results, logger=None, spin_dependent=True, filename=None, plot_dir=None
 ):
     if plot_dir is None:
-        plot_dir = "/media/jt/data/Projects/MSSM/LBI/pMSSM/plots/"
+        plot_dir = "/Users/nolansmyth/Code/SBI/MSSM/plots/"
     if filename is None:
         filename = "direct_detection.png"
     filename = os.path.join(plot_dir, filename)
@@ -82,8 +82,8 @@ def plot_direct_detection_limits(
 
         xsec = (
             4
-            * (M_chi ** 2)
-            * (M_nuc ** 2)
+            * (M_chi**2)
+            * (M_nuc**2)
             / (onp.pi * (M_chi + M_nuc) ** 2)
             * amp_coeff
             * onp.abs(amp) ** 2
@@ -137,7 +137,7 @@ def plot_direct_detection_limits(
         )
         plt.scatter(
             chi_masses,
-            neutron_si_xsec / inv_gev_to_cm ** 2,
+            neutron_si_xsec / inv_gev_to_cm**2,
             marker=".",
             c=results["pval_xenon1T"],
         )
@@ -164,7 +164,7 @@ def plot_observable_corner(
     X_true, X_sigma, results, logger=None, filename=None, levels=None, plot_dir=None
 ):
     if plot_dir is None:
-        plot_dir = "/media/jt/data/Projects/MSSM/LBI/pMSSM/plots/"
+        plot_dir = "/Users/nolansmyth/Code/SBI/MSSM/plots/"
     if levels is None:
         levels = onp.array([0.68, 0.95])
     if filename is None:
@@ -235,7 +235,7 @@ def plot_observable_corner(
 
 def plot_masses_corner(results, logger=None, filename=None, levels=None, plot_dir=None):
     if plot_dir is None:
-        plot_dir = "/media/jt/data/Projects/MSSM/LBI/pMSSM/plots/"
+        plot_dir = "/Users/nolansmyth/Code/SBI/MSSM/plots/"
     if levels is None:
         levels = onp.array([0.68, 0.95])
 
@@ -280,7 +280,7 @@ def plot_gaugino_corner(
     samples, logger=None, filename=None, levels=None, plot_dir=None
 ):
     if plot_dir is None:
-        plot_dir = "/media/jt/data/Projects/MSSM/LBI/pMSSM/plots/"
+        plot_dir = "/Users/nolansmyth/Code/SBI/MSSM/plots/"
     if levels is None:
         levels = onp.array([0.68, 0.95])
 
@@ -321,13 +321,13 @@ def plot_gaugino_corner(
 
 def plot_mass_splitting(results, logger=None, filename=None, plot_dir=None):
     if plot_dir is None:
-        plot_dir = "/media/jt/data/Projects/MSSM/LBI/pMSSM/plots/"
+        plot_dir = "/Users/nolansmyth/Code/SBI/MSSM/plots/"
     if filename is None:
         filename = os.path.join(
             plot_dir,
             "LHC_mass_splitting_constraints.png",
         )
-    
+
     slepton_masses = onp.array(
         [results["msel"], results["msml"], results["mser"], results["msmr"]]
     ).T
@@ -376,7 +376,7 @@ def prior_plotter(
     comparing with the posterior to see how much has been learned.
     """
     if plot_dir is None:
-        plot_dir = "/media/jt/data/Projects/MSSM/LBI/pMSSM/plots/"
+        plot_dir = "/Users/nolansmyth/Code/SBI/MSSM/plots/"
     if filename is None:
         filename = "prior_plot.png"
     filename = os.path.join(plot_dir, filename)
@@ -418,7 +418,7 @@ def prior_plotter(
 
 def M1_vs_mchi(unitful_samples, results, logger=None, filename=None, plot_dir=None):
     if plot_dir is None:
-        plot_dir = "/media/jt/data/Projects/MSSM/LBI/pMSSM/plots/"
+        plot_dir = "/Users/nolansmyth/Code/SBI/MSSM/plots/"
     if filename is None:
         filename = "M1_vs_mchi.png"
     filename = os.path.join(plot_dir, filename)
