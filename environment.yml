@@ -1,4 +1,4 @@
-name: mssm
+name: mssm2
 channels:
   - defaults
 dependencies:

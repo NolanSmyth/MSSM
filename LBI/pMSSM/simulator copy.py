@@ -12,7 +12,7 @@ sys.path.append("/Users/nolansmyth/Code/SBI/MSSM/LBI/pMSSM/pymicromegas/micromeg
 
 # from utils.distributed import apply_distributed
 from pymicromegas import EwsbParameters, MicromegasSettings
-from spheno import spheno
+import spheno
 
 from atlas_constraints import calc_atlas_pvals
 
@@ -122,53 +122,6 @@ def get_mass_split_and_mchi(results):
 
     return mass_splitting, chi_masses
 
-global simulator_func
-def simulator_func(unitless_theta):
-        """
-        Parameters:
-        -----------
-        rng: jax rng object
-        theta: cMSSM parameters
-
-        Returns:
-            observables
-        """
-        settings = MicromegasSettings(
-        relic_density=True,
-        masses=True,
-        gmuon=True,
-        fast=True,
-        # nucleon_amplitudes=True,
-        direct_detection_pvalues=True,
-        # masslimits=True,
-        # bsg=True,
-        # bsmumu=True,
-        # btaunu=True,
-        # delta_rho=True,
-        # sort_odd=True,
-        # beps=0.0001,
-        # cut=0.01,
-    )
-        use_direct_detection = True
-        use_atlas_constraints = True
-        micromegas_simulator = "spheno"
-        preprocess = lambda x: x
-
-        _simulator = micromegas[micromegas_simulator]
-
-        theta = theta_addunits(unitless_theta)
-        params = [EwsbParameters(*th) for th in theta]
-        results = _simulator(params=params, settings=settings)
-        out = onp.array([results.omega, results.gmuon, results.mhsm])
-        if use_direct_detection:
-            out = onp.vstack([out, results.pval_xenon1T])
-        if use_atlas_constraints:
-            atlas_pvals = calc_atlas_pvals(*get_mass_split_and_mchi(results))
-            out = onp.vstack([out, atlas_pvals])
-
-        out = out.T
-        out = preprocess(out)
-        return out
 
 def get_simulator(
     micromegas_simulator=None,
@@ -189,7 +142,7 @@ def get_simulator(
         obs_dim: the dimension of the observation space
         theta_dim: the dimension of the theta space
     """
-    # global simulator
+    global simulator
 
     if preprocess is None:
         preprocess = lambda x: x
@@ -211,6 +164,29 @@ def get_simulator(
         # cut=0.01,
     )
 
+    def simulator(unitless_theta):
+        """
+        Parameters:
+        -----------
+        rng: jax rng object
+        theta: cMSSM parameters
+
+        Returns:
+            observables
+        """
+        theta = theta_addunits(unitless_theta)
+        params = [EwsbParameters(*th) for th in theta]
+        results = _simulator(params=params, settings=settings)
+        out = onp.array([results.omega, results.gmuon, results.mhsm])
+        if use_direct_detection:
+            out = onp.vstack([out, results.pval_xenon1T])
+        if use_atlas_constraints:
+            atlas_pvals = calc_atlas_pvals(*get_mass_split_and_mchi(results))
+            out = onp.vstack([out, atlas_pvals])
+
+        out = out.T
+        out = preprocess(out)
+        return out
 
     if micromegas_simulator is None:
         micromegas_simulator = "spheno"
@@ -221,7 +197,7 @@ def get_simulator(
 
     distributed_simulator = (
         lambda rng, args, num_samples_per_theta=1: apply_distributed(
-            simulator_func, args, nprocs=10
+            simulator, args, nprocs=10
         )
     )
 

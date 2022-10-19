@@ -74,7 +74,7 @@ def test_f(x, y):
 
 if __name__ == "__main__":
     args_array = [(random.random(), random.random()) for _ in range(100)]
-    results = apply_distributed(test_f, args_array)
+    results = apply_distributed(test_f, *args_array)
     for res in results:
         for r in res:
             print(r)
