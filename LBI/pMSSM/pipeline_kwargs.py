@@ -16,7 +16,8 @@ pipeline_kwargs = {
     "learning_rate": 3e-4,
     "weight_decay": 1e-2,
     # Train hyperparameters
-    "nsteps": 250000,
+    # "nsteps": 250000,
+    "nsteps": 25,
     "patience": 30,
     "eval_interval": 100,
     # Dataloader hyperparameters
@@ -27,8 +28,10 @@ pipeline_kwargs = {
     # Sequential hyperparameters
     "num_rounds": 1,
     "num_initial_samples": 10,
-    "num_samples_per_round": 1000 // 10,
-    "num_warmup_per_round": 2000,
+    # "num_samples_per_round": 1000 // 10,
+    "num_samples_per_round": 100 // 10,
+    # "num_warmup_per_round": 2000,
+    "num_warmup_per_round": 10,
     "num_chains": 1,
     "logger": None,
 }

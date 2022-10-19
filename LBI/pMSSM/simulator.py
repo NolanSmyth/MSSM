@@ -2,6 +2,7 @@ import jax
 import jax.numpy as np
 import numpy as onp
 from tqdm.auto import tqdm
+from pipeline_kwargs import pipeline_kwargs
 
 from utils.distributed import apply_distributed
 
@@ -149,8 +150,8 @@ def simulator_func(unitless_theta):
         # beps=0.0001,
         # cut=0.01,
     )
-        use_direct_detection = True
-        use_atlas_constraints = True
+        use_direct_detection = pipeline_kwargs["simulator_kwargs"]["use_direct_detection"]
+        use_atlas_constraints = pipeline_kwargs["simulator_kwargs"]['use_atlas_constraints']
         micromegas_simulator = "spheno"
         preprocess = lambda x: x
 
@@ -244,6 +245,67 @@ def get_simulator(
     # test_simulator = lambda rng, args, num_samples_per_theta=1: simulator(args)
     # return test_simulator, obs_dim, theta_dim
 
+global results_simulator_func
+
+def results_simulator_func(unitless_theta):
+    """
+    Parameters:
+    -----------
+    rng: jax rng object
+    theta: cMSSM parameters
+
+    Returns:
+        observables
+    """
+
+    theta = theta_addunits(unitless_theta)
+    params = [EwsbParameters(*th) for th in theta]
+
+    settings = MicromegasSettings(
+        relic_density=True,
+        masses=True,
+        gmuon=True,
+        fast=True,
+        nucleon_amplitudes=True,
+        direct_detection_pvalues=True,
+        masslimits=True,
+        # bsg=True,
+        # bsmumu=True,
+        # btaunu=True,
+        # delta_rho=True,
+        # sort_odd=True,
+        # beps=0.0001,
+        # cut=0.01,
+    )
+
+    micromegas_simulator = "spheno"
+    _simulator = micromegas[micromegas_simulator]
+
+    results = _simulator(params=params, settings=settings)
+    obs_keys = [
+        "mneut1",
+        "mneut2",
+        "mchg1",
+        "mchg2",
+        "msel",
+        "msml",
+        "mser",
+        "msmr",
+        "mhsm",
+        "omega",
+        "gmuon",
+        "neutron_sd_amp",
+        "neutron_si_amp",
+        "proton_sd_amp",
+        "proton_si_amp",
+        "pval_xenon1T",
+    ]
+
+    atlas_pvals = calc_atlas_pvals(*get_mass_split_and_mchi(results))
+
+    out_dict = {key: getattr(results, key) for key in obs_keys}
+    out_dict["atlas_pvals"] = atlas_pvals
+    return [out_dict]
 
 def get_simulator_with_more_observables(
     micromegas_simulator=None, preprocess=None, **kwargs
@@ -270,46 +332,6 @@ def get_simulator_with_more_observables(
         # cut=0.01,
     )
 
-    global results_simulator
-
-    def results_simulator(unitless_theta):
-        """
-        Parameters:
-        -----------
-        rng: jax rng object
-        theta: cMSSM parameters
-
-        Returns:
-            observables
-        """
-
-        theta = theta_addunits(unitless_theta)
-        params = [EwsbParameters(*th) for th in theta]
-        results = _simulator(params=params, settings=settings)
-        obs_keys = [
-            "mneut1",
-            "mneut2",
-            "mchg1",
-            "mchg2",
-            "msel",
-            "msml",
-            "mser",
-            "msmr",
-            "mhsm",
-            "omega",
-            "gmuon",
-            "neutron_sd_amp",
-            "neutron_si_amp",
-            "proton_sd_amp",
-            "proton_si_amp",
-            "pval_xenon1T",
-        ]
-
-        atlas_pvals = calc_atlas_pvals(*get_mass_split_and_mchi(results))
-
-        out_dict = {key: getattr(results, key) for key in obs_keys}
-        out_dict["atlas_pvals"] = atlas_pvals
-        return [out_dict]
 
     if micromegas_simulator is None:
         micromegas_simulator = "spheno"
@@ -318,7 +340,7 @@ def get_simulator_with_more_observables(
 
     distributed_simulator = (
         lambda rng, args, num_samples_per_theta=1: apply_distributed(
-            results_simulator, args, nprocs=10
+            results_simulator_func, args, nprocs=10
         )
     )
 

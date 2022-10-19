@@ -106,8 +106,6 @@ if __name__ == "__main__":
     # Plot prior
     lp.prior_plotter(sample_prior)
 
-    print("HERE1")
-
     model, log_prob, params, Theta_post = pipeline(
         rng,
         X_true,
@@ -122,7 +120,6 @@ if __name__ == "__main__":
         **pipeline_kwargs,
     )
 
-    print("HERE2")
 
     parallel_log_prob = jax.vmap(log_prob, in_axes=(0, None, None))
 
@@ -150,8 +147,10 @@ if __name__ == "__main__":
         dense_mass=True,
         step_size=1e0,
         max_tree_depth=8,
-        num_warmup=2000,
-        num_samples=750,
+        # num_warmup=2000,
+        num_warmup=pipeline_kwargs["num_warmup_per_round"],
+        # num_samples=750,
+        num_samples=pipeline_kwargs["num_initial_samples"],
         num_chains=num_chains,
         extra_fields=("potential_energy",),
         chain_method="vectorized",
