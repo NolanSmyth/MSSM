@@ -135,8 +135,7 @@ if __name__ == "__main__":
         log_post = -(log_L + log_P)
         return log_post.sum()
 
-    num_chains = 16
-    init_theta = sample_prior(rng, num_samples=num_chains)
+    init_theta = sample_prior(rng, num_samples=pipeline_kwargs["num_chains"])
 
     mcmc = hmc(
         rng,
@@ -150,8 +149,8 @@ if __name__ == "__main__":
         # num_warmup=2000,
         num_warmup=pipeline_kwargs["num_warmup_per_round"],
         # num_samples=750,
-        num_samples=pipeline_kwargs["num_initial_samples"],
-        num_chains=num_chains,
+        num_samples=pipeline_kwargs["num_samples_per_round"],
+        num_chains=pipeline_kwargs["num_chains"],
         extra_fields=("potential_energy",),
         chain_method="vectorized",
     )
