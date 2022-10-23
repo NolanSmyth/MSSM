@@ -4,8 +4,8 @@ pipeline_kwargs = {
     # Model hyperparameters
     "model_type": "classifier",  # "classifier" or "flow"
     "ensemble_size": 5,
-    "num_layers": 5,
-    "hidden_dim": 512,
+    "num_layers": 3,
+    "hidden_dim": 256,
     # flow specific parameters
     "transform_type": "MaskedPiecewiseRationalQuadraticAutoregressiveTransform",
     "permutation": "Conv1x1",
@@ -14,21 +14,27 @@ pipeline_kwargs = {
     # Optimizer hyperparmeters
     "max_norm": 1e-3,
     "learning_rate": 3e-4,
-    "weight_decay": 1e-2,
+    # "weight_decay": 1e-6,
+    "weight_decay": 0,
     # Train hyperparameters
     "nsteps": 250000,
-    "patience": 30,
-    "eval_interval": 100,
+    # "patience": 30,
+    "patience": 200,
+    # "eval_interval": 100,
+    "eval_interval": 50,
     # Dataloader hyperparameters
-    "batch_size": 128,
-    "train_split": 0.9,
+    # "batch_size": 256,
+    "batch_size": 64,
+    "train_split": 0.95,
     "num_workers": 0,
     "add_noise": True,
     # Sequential hyperparameters
-    "num_rounds": 1,
-    "num_initial_samples": 10,
-    "num_samples_per_round": 1000 // 10,
+    "num_rounds": 10,
+    "num_initial_samples": 500,
+    # "num_samples_per_round": 1000 // 10,
+    "num_samples_per_round": 5000,
     "num_warmup_per_round": 2000,
+    # "num_warmup_per_round": 200,
     "num_chains": 16,
     "logger": None,
 }

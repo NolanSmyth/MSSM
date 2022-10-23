@@ -106,6 +106,7 @@ if __name__ == "__main__":
     # Plot prior
     lp.prior_plotter(sample_prior)
 
+
     model, log_prob, params, Theta_post = pipeline(
         rng,
         X_true,

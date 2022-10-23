@@ -140,7 +140,8 @@ def plot_direct_detection_limits(
             neutron_si_xsec / inv_gev_to_cm**2,
             marker=".",
             #! This should be atlas!?
-            c=results["pval_xenon1T"],
+            # c=results["pval_xenon1T"],
+            c=results["atlas_pvals"],
         )
         plt.yscale("log")
         plt.xlim(20, 900)
@@ -149,7 +150,9 @@ def plot_direct_detection_limits(
         plt.xlabel(r"WIMP mass (GeV)")
         plt.ylabel(r"WIMP-neutron $\sigma^{SI}$ (cm$^{2}$)")
 
-        plt.colorbar()
+        colorbar = plt.colorbar()
+        colorbar.set_label("$\mathcal{P}$ATLAS", rotation=270, labelpad=15)
+        plt.clim(0, 1)
         plt.legend()
 
     if hasattr(logger, "plot"):
@@ -324,10 +327,11 @@ def plot_mass_splitting(results, logger=None, filename=None, plot_dir=None):
     if plot_dir is None:
         plot_dir = "/Users/nolansmyth/Code/SBI/MSSM/plots/"
     if filename is None:
-        filename = os.path.join(
-            plot_dir,
-            "LHC_mass_splitting_constraints.png",
-        )
+        filename = "LHC_mass_splitting_constraints.png"
+    filename = os.path.join(
+        plot_dir,
+        filename,
+    )
 
     slepton_masses = onp.array(
         [results["msel"], results["msml"], results["mser"], results["msmr"]]
@@ -358,7 +362,10 @@ def plot_mass_splitting(results, logger=None, filename=None, plot_dir=None):
     plt.yscale("log")
 
     plt.legend()
-    plt.colorbar()
+    colorbar = plt.colorbar()
+    colorbar.set_label("$\mathcal{P}$Xenon1T", rotation=270, labelpad=15)
+    plt.clim(0, 1)
+    plt.legend()
     if hasattr(logger, "plot"):
         logger.plot(f"Final Corner Plot of Observables", plt, close_plot=True)
     else:
