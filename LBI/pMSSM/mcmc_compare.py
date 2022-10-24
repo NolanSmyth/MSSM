@@ -106,32 +106,15 @@ if __name__ == "__main__":
     # Plot prior
     lp.prior_plotter(sample_prior)
 
-    model, log_prob, params, Theta_post = pipeline(
-        rng,
-        X_true,
-        get_simulator,
-        # Prior
-        log_prior,
-        sample_prior,
-        # scaling
-        sigma=X_sigma,
-        scale_X=scale_X,
-        scale_Theta=scale_Theta,
-        **pipeline_kwargs,
-    )
-
-    parallel_log_prob = jax.vmap(log_prob, in_axes=(0, None, None))
+    #? I think the potential function needs to call the simulator + gaussian noise
+    #? Which can come from simulate and data_loader_builder
 
     def potential_fn(theta):
         if len(theta.shape) == 1:
             theta = theta[None, :]
 
         log_P = log_prior(theta)
-
-        log_L = parallel_log_prob(params, X_true, theta)
-        log_L = log_L.mean(axis=0)
-
-        log_post = -(log_L + log_P)
+        log_post = -(log_P)
         return log_post.sum()
 
     num_chains_results = 32
@@ -150,8 +133,8 @@ if __name__ == "__main__":
         max_tree_depth=8,
         # num_warmup=2000,
         # num_samples=750,
-        num_warmup=100,
-        num_samples=100,
+        num_warmup=2000,
+        num_samples=750,
         num_chains=num_chains_results,
         extra_fields=("potential_energy",),
         chain_method="vectorized",
@@ -224,7 +207,7 @@ if __name__ == "__main__":
         if hasattr(logger, "plot"):
             logger.plot(f"Final Corner Plot", plt, close_plot=True)
         else:
-            plt.savefig("posterior_corner.png")
+            plt.savefig("posterior_corner_mcmc.png")
     except KeyboardInterrupt:
         print("Could not plot corner plot")
     plt.clf()
@@ -249,7 +232,7 @@ if __name__ == "__main__":
     samples_and_results = results
     samples_and_results["samples"] = unitful_samples[:num_samples]
 
-    hf = h5py.File("samples_and_results_new.h5", "w")
+    hf = h5py.File("samples_and_results_mcmc.h5", "w")
     for key, arr in samples_and_results.items():
         hf.create_dataset(key, data=arr)
     hf.close()
@@ -267,13 +250,13 @@ if __name__ == "__main__":
     lp.M1_vs_mchi(samples[:num_samples], results)
     lp.plot_observable_corner(X_true, X_sigma, results, logger=logger)
     lp.plot_direct_detection_limits(
-        results, logger=logger, filename="unfiltered_direct_detection.png"
+        results, logger=logger, filename="unfiltered_direct_detection_mcmc.png"
     )
     lp.plot_mass_splitting(
-        results, logger=logger, filename="unfiltered_LHC_constraints.png"
+        results, logger=logger, filename="unfiltered_LHC_constraints_mcmc.png"
     )
     lp.plot_masses_corner(
-        results, logger=logger, filename="unfiltered_masses_corner.png"
+        results, logger=logger, filename="unfiltered_masses_corner_mcmc.png"
     )
 
     filtered_unitful_samples, filtered_results = lp.filter_observables(
@@ -282,10 +265,16 @@ if __name__ == "__main__":
 
     print(filtered_unitful_samples.shape[0], "samples after filtering")
 
-    lp.plot_direct_detection_limits(filtered_results, logger=logger)
-    lp.plot_mass_splitting(filtered_results, logger=logger)
+    lp.plot_direct_detection_limits(
+        filtered_results, logger=logger, filename="direct_detection_mcmc.png"
+    )
+    lp.plot_mass_splitting(
+        filtered_results, logger=logger, filename="LHC_constraints_mcmc.png"
+    )
     try:
-        lp.plot_masses_corner(filtered_results, logger=logger)
+        lp.plot_masses_corner(
+            filtered_results, logger=logger, filename="masses_corner_mcmc.png"
+        )
     except:
         print("Could not plot masses corner")
 
@@ -295,7 +284,7 @@ if __name__ == "__main__":
         if hasattr(logger, "plot"):
             logger.plot(f"Final Corner Plot", plt, close_plot=True)
         else:
-            plt.savefig("filtered_posterior_corner.png")
+            plt.savefig("filtered_posterior_corner_mcmc.png")
         plt.clf()
     except:
         print("Could not plot filtered posterior corner")
