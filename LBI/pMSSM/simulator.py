@@ -9,7 +9,9 @@ from utils.distributed import apply_distributed
 import sys
 
 # sys.path.append("./pymicromegas/micromegas/MSSM")
-sys.path.append("/Users/nolansmyth/Code/SBI/MSSM/LBI/pMSSM/pymicromegas/micromegas/MSSM")
+sys.path.append(
+    "/Users/nolansmyth/Code/SBI/MSSM/LBI/pMSSM/pymicromegas/micromegas/MSSM"
+)
 
 # from utils.distributed import apply_distributed
 from pymicromegas import EwsbParameters, MicromegasSettings
@@ -123,18 +125,21 @@ def get_mass_split_and_mchi(results):
 
     return mass_splitting, chi_masses
 
-global simulator_func
-def simulator_func(unitless_theta):
-        """
-        Parameters:
-        -----------
-        rng: jax rng object
-        theta: cMSSM parameters
 
-        Returns:
-            observables
-        """
-        settings = MicromegasSettings(
+global simulator_func
+
+
+def simulator_func(unitless_theta):
+    """
+    Parameters:
+    -----------
+    rng: jax rng object
+    theta: cMSSM parameters
+
+    Returns:
+        observables
+    """
+    settings = MicromegasSettings(
         relic_density=True,
         masses=True,
         gmuon=True,
@@ -150,26 +155,27 @@ def simulator_func(unitless_theta):
         # beps=0.0001,
         # cut=0.01,
     )
-        use_direct_detection = pipeline_kwargs["simulator_kwargs"]["use_direct_detection"]
-        use_atlas_constraints = pipeline_kwargs["simulator_kwargs"]['use_atlas_constraints']
-        micromegas_simulator = "spheno"
-        preprocess = lambda x: x
+    use_direct_detection = pipeline_kwargs["simulator_kwargs"]["use_direct_detection"]
+    use_atlas_constraints = pipeline_kwargs["simulator_kwargs"]["use_atlas_constraints"]
+    micromegas_simulator = "spheno"
+    preprocess = lambda x: x
 
-        _simulator = micromegas[micromegas_simulator]
+    _simulator = micromegas[micromegas_simulator]
 
-        theta = theta_addunits(unitless_theta)
-        params = [EwsbParameters(*th) for th in theta]
-        results = _simulator(params=params, settings=settings)
-        out = onp.array([results.omega, results.gmuon, results.mhsm])
-        if use_direct_detection:
-            out = onp.vstack([out, results.pval_xenon1T])
-        if use_atlas_constraints:
-            atlas_pvals = calc_atlas_pvals(*get_mass_split_and_mchi(results))
-            out = onp.vstack([out, atlas_pvals])
+    theta = theta_addunits(unitless_theta)
+    params = [EwsbParameters(*th) for th in theta]
+    results = _simulator(params=params, settings=settings)
+    out = onp.array([results.omega, results.gmuon, results.mhsm])
+    if use_direct_detection:
+        out = onp.vstack([out, results.pval_xenon1T])
+    if use_atlas_constraints:
+        atlas_pvals = calc_atlas_pvals(*get_mass_split_and_mchi(results))
+        out = onp.vstack([out, atlas_pvals])
 
-        out = out.T
-        out = preprocess(out)
-        return out
+    out = out.T
+    out = preprocess(out)
+    return out
+
 
 def get_simulator(
     micromegas_simulator=None,
@@ -212,7 +218,6 @@ def get_simulator(
         # cut=0.01,
     )
 
-
     if micromegas_simulator is None:
         micromegas_simulator = "spheno"
 
@@ -222,7 +227,7 @@ def get_simulator(
 
     distributed_simulator = (
         lambda rng, args, num_samples_per_theta=1: apply_distributed(
-            simulator_func, args, nprocs=10
+            simulator_func, args, nprocs=None
         )
     )
 
@@ -245,7 +250,9 @@ def get_simulator(
     # test_simulator = lambda rng, args, num_samples_per_theta=1: simulator(args)
     # return test_simulator, obs_dim, theta_dim
 
+
 global results_simulator_func
+
 
 def results_simulator_func(unitless_theta):
     """
@@ -307,6 +314,7 @@ def results_simulator_func(unitless_theta):
     out_dict["atlas_pvals"] = atlas_pvals
     return [out_dict]
 
+
 def get_simulator_with_more_observables(
     micromegas_simulator=None, preprocess=None, **kwargs
 ):
@@ -332,7 +340,6 @@ def get_simulator_with_more_observables(
         # cut=0.01,
     )
 
-
     if micromegas_simulator is None:
         micromegas_simulator = "spheno"
 
@@ -340,7 +347,7 @@ def get_simulator_with_more_observables(
 
     distributed_simulator = (
         lambda rng, args, num_samples_per_theta=1: apply_distributed(
-            results_simulator_func, args, nprocs=10
+            results_simulator_func, args, nprocs=None
         )
     )
 

@@ -106,7 +106,6 @@ if __name__ == "__main__":
     # Plot prior
     lp.prior_plotter(sample_prior)
 
-
     model, log_prob, params, Theta_post = pipeline(
         rng,
         X_true,
@@ -121,6 +120,9 @@ if __name__ == "__main__":
         **pipeline_kwargs,
     )
 
+    print("After pipeline")
+
+    # I think everything above here is getting the prior. No MCMC yet.
 
     parallel_log_prob = jax.vmap(log_prob, in_axes=(0, None, None))
 
@@ -147,11 +149,9 @@ if __name__ == "__main__":
         dense_mass=True,
         step_size=1e0,
         max_tree_depth=8,
-        # num_warmup=2000,
-        num_warmup=pipeline_kwargs["num_warmup_per_round"],
-        # num_samples=750,
-        num_samples=pipeline_kwargs["num_samples_per_round"],
-        num_chains=pipeline_kwargs["num_chains"],
+        num_warmup=2000,
+        num_samples=750,
+        num_chains=32,
         extra_fields=("potential_energy",),
         chain_method="vectorized",
     )
@@ -248,7 +248,7 @@ if __name__ == "__main__":
     samples_and_results = results
     samples_and_results["samples"] = unitful_samples[:num_samples]
 
-    hf = h5py.File("samples_and_results.h5", "w")
+    hf = h5py.File("samples_and_results_new.h5", "w")
     for key, arr in samples_and_results.items():
         hf.create_dataset(key, data=arr)
     hf.close()

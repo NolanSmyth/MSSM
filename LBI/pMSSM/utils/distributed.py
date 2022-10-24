@@ -47,9 +47,10 @@ def apply_distributed(
     """
     if nprocs is None:
         nprocs = mp.cpu_count() - 1
-        
+
     chunks = [args_array[i : i + nprocs] for i in range(0, len(args_array), nprocs)]
     workers = [Worker(f, chunk, chdir) for chunk in chunks]
+
     procs = mp.Pool(len(chunks))
     cdir = os.getcwd()
     results = []
