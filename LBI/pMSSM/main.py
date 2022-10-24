@@ -138,7 +138,8 @@ if __name__ == "__main__":
         log_post = -(log_L + log_P)
         return log_post.sum()
 
-    init_theta = sample_prior(rng, num_samples=pipeline_kwargs["num_chains"])
+    num_chains_results = 32
+    init_theta = sample_prior(rng, num_samples=num_chains_results)
 
     mcmc = hmc(
         rng,
@@ -151,7 +152,7 @@ if __name__ == "__main__":
         max_tree_depth=8,
         num_warmup=2000,
         num_samples=750,
-        num_chains=32,
+        num_chains=num_chains_results,
         extra_fields=("potential_energy",),
         chain_method="vectorized",
     )
