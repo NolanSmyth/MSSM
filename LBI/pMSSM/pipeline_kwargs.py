@@ -19,8 +19,6 @@ pipeline_kwargs = {
     # Train hyperparameters
     "nsteps": 250000,
     # "patience": 30,
-    "patience": 20,
-    # "eval_interval": 100,
     "eval_interval": 100,
     # Dataloader hyperparameters
     "batch_size": 256,
@@ -28,12 +26,12 @@ pipeline_kwargs = {
     "num_workers": 0,
     "add_noise": True,
     # Sequential hyperparameters
-    "num_rounds": 3,
-    # "num_initial_samples": 500,
-    "num_initial_samples": 10,
+    "num_rounds": 1,
+    "num_initial_samples": 100,
+    # "num_initial_samples": 20000,
     # "num_samples_per_round": 1000 // 10,
     "num_samples_per_round": 100,
-    "num_warmup_per_round": 200,
+    "num_warmup_per_round": 10,
     "num_chains": 16,
     "logger": None,
 }

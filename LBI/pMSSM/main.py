@@ -150,8 +150,8 @@ if __name__ == "__main__":
         max_tree_depth=8,
         # num_warmup=2000,
         # num_samples=750,
-        num_warmup=100,
-        num_samples=100,
+        num_warmup=10,
+        num_samples=10,
         num_chains=num_chains_results,
         extra_fields=("potential_energy",),
         chain_method="vectorized",
@@ -249,10 +249,10 @@ if __name__ == "__main__":
     samples_and_results = results
     samples_and_results["samples"] = unitful_samples[:num_samples]
 
-    hf = h5py.File("samples_and_results_new.h5", "w")
-    for key, arr in samples_and_results.items():
-        hf.create_dataset(key, data=arr)
-    hf.close()
+    # hf = h5py.File("samples_and_results_new.h5", "w")
+    # for key, arr in samples_and_results.items():
+    #     hf.create_dataset(key, data=arr)
+    # hf.close()
 
     # --------------------------
     # Plot the samples and results

@@ -6,6 +6,8 @@ import tempfile
 import os
 import random
 
+# from multiprocessing import freeze_support, set_start_method
+
 
 class Worker:
     def __init__(self, f, chunk, chdir=True) -> None:
@@ -47,17 +49,19 @@ def apply_distributed(
     """
     if nprocs is None:
         nprocs = mp.cpu_count() - 1
+        # nprocs = 1
 
     chunks = [args_array[i : i + nprocs] for i in range(0, len(args_array), nprocs)]
     workers = [Worker(f, chunk, chdir) for chunk in chunks]
 
-    procs = mp.Pool(len(chunks))
+    print(len(chunks))
+    # procs = mp.Pool(len(chunks), maxtasksperchild=1)
+    procs = mp.Pool(nprocs, maxtasksperchild=2)
     cdir = os.getcwd()
     results = []
     for worker in workers:
         results.append(procs.apply_async(work, (worker, cdir)))
-    procs.close()
-    procs.join()
+
     # import IPython; IPython.embed()
     out = []
     for result in results:
@@ -66,6 +70,11 @@ def apply_distributed(
             out.append(output[0])
     results = onp.array(out)
     results = results.reshape(len(args_array), -1)
+
+    # [res.wait() for res in results]
+    procs.close()
+    procs.join()
+
     return results
 
 
@@ -73,10 +82,10 @@ def test_f(x, y):
     return [x * y, os.getcwd()]
 
 
-if __name__ == "__main__":
-    args_array = [(random.random(), random.random()) for _ in range(100)]
-    results = apply_distributed(test_f, *args_array)
-    for res in results:
-        for r in res:
-            print(r)
-        print()
+# if __name__ == "__main__":
+# args_array = [(random.random(), random.random()) for _ in range(100)]
+# results = apply_distributed(test_f, *args_array)
+# for res in results:
+#     for r in res:
+#         print(r)
+#     print()

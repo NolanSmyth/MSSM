@@ -13,7 +13,6 @@ sys.path.append(
     "/Users/nolansmyth/Code/SBI/MSSM/LBI/pMSSM/pymicromegas/micromegas/MSSM"
 )
 
-# from utils.distributed import apply_distributed
 from pymicromegas import EwsbParameters, MicromegasSettings
 from spheno import spheno
 
@@ -237,7 +236,8 @@ def get_simulator(
         batches = np.array_split(args, 1 + len(args) // batch_size)
         results = []
         for batch in tqdm(batches):
-            # print(batch)
+            print("batches len", len(batches))
+            print("batch len", len(batch))
             results.append(
                 distributed_simulator(
                     rng, batch, num_samples_per_theta=num_samples_per_theta
