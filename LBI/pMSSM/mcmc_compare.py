@@ -106,8 +106,8 @@ if __name__ == "__main__":
     # Plot prior
     lp.prior_plotter(sample_prior)
 
-    #? I think the potential function needs to call the simulator + gaussian noise
-    #? Which can come from simulate and data_loader_builder
+    # ? I think the potential function needs to call the simulator + gaussian noise
+    # ? Which can come from simulate and data_loader_builder
 
     def potential_fn(theta):
         if len(theta.shape) == 1:
@@ -134,7 +134,7 @@ if __name__ == "__main__":
         # num_warmup=2000,
         # num_samples=750,
         num_warmup=2000,
-        num_samples=750,
+        num_samples=3000,
         num_chains=num_chains_results,
         extra_fields=("potential_energy",),
         chain_method="vectorized",

@@ -19,6 +19,7 @@ pyplot_params = {
     "backend": "TkAgg",
     "font.family": "serif",
     "font.serif": ["CMU serif"],
+    "image.cmap": "viridis_r",
     "axes.prop_cycle": cycler(
         "color",
         [
@@ -144,10 +145,10 @@ def plot_direct_detection_limits(
             c=results["atlas_pvals"],
         )
         plt.yscale("log")
-        plt.xlim(20, 900)
-        plt.ylim(1e-50, 1e-38)
+        plt.xlim(50, 700)
+        plt.ylim(1e-50, 1e-44)
 
-        plt.xlabel(r"WIMP mass (GeV)")
+        plt.xlabel(r"$M_\chi$ (GeV)")
         plt.ylabel(r"WIMP-neutron $\sigma^{SI}$ (cm$^{2}$)")
 
         colorbar = plt.colorbar()
