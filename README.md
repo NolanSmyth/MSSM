@@ -5,7 +5,7 @@
 <!---[![BibTex](http://img.shields.io/badge/BibTex-4682b4.svg)](https://ui.adsabs.harvard.edu/abs//exportcitation)-->
 
 
-In [our paper](https://arxiv.org/abs/2006.00615), we introduce the simulation-based inference (SBI) framework to the problem of sampling from experimentally-constrained theory spaces. 
+In [our paper](https://arxiv.org/abs/2203.13403), we introduce the simulation-based inference (SBI) framework to the problem of sampling from experimentally-constrained theory spaces. 
 
 
 In this repository, you'll find SBI applications to cMSSM and pMSSM parameter space samplings. The main 
